@@ -139,4 +139,3 @@ def query_nvd(keyword=None, cve_id=None, results_per_page=10):
         return None, f"An unexpected error occurred: {str(e)}"
 
 
-print(query_nvd(keyword="Apache"))

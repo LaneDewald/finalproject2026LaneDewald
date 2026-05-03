@@ -1,0 +1,57 @@
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* CVSS score badge, the circular score display */
+.cvss-score-badge {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+    padding-top: 16px;
+    line-height: 1.2;
+}
+
+.cvss-score-badge .score-number {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.cvss-score-badge .score-label {
+    font-size: 0.65rem;
+    opacity: 0.9;
+}
+
+/* CVE result cards, subtle hover effect */
+.cve-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cve-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+}
+
+/* footer */
+.footer {
+    margin-top: auto;
+}
+
+/* make the navbar brand look a bit more like a security tool */
+.navbar-brand {
+    letter-spacing: 0.5px;
+}
+
+/* severity color overrides, bg-warning needs dark text */
+.badge.bg-warning {
+    color: #212529;
+}
