@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}CVE Lookup Tool - Home{% endblock %}
+ 
+{% block content %}
+<div class="text-center py-5">
+    <div class="mb-4">
+        <i class="bi bi-shield-exclamation display-1 text-danger"></i>
+    </div>
+    <h1 class="display-5 fw-bold">CVE Lookup Tool</h1>
+    <p class="lead text-muted mb-4">
+        Search and explore vulnerability data from the National Vulnerability Database (NVD).<br>
+        Look up CVEs by ID or keyword, compare vulnerabilities side by side, and learn about severity scoring.
+    </p>
+ 
+    <!-- quick search form right on the home page -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-6">
+            <form action="{{ url_for('search') }}" method="POST">
+                <div class="input-group input-group-lg">
+                    <input type="text" name="query" class="form-control" placeholder="Search CVEs... (e.g. Apache, CVE-2021-44228)">
+                    <input type="hidden" name="search_type" value="keyword">
+                    <button class="btn btn-danger" type="submit">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+ 
+    <!-- feature cards -->
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-search fs-1 text-primary mb-3"></i>
+                    <h5 class="card-title">Search CVEs</h5>
+                    <p class="card-text text-muted">Search by keyword or exact CVE ID. Get severity scores, descriptions, and reference links.</p>
+                    <a href="{{ url_for('search') }}" class="btn btn-outline-primary btn-sm">Go Search</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-bar-chart-steps fs-1 text-success mb-3"></i>
+                    <h5 class="card-title">Compare CVEs</h5>
+                    <p class="card-text text-muted">Compare two CVEs side by side to quickly evaluate which one is more severe or relevant.</p>
+                    <a href="{{ url_for('compare') }}" class="btn btn-outline-success btn-sm">Compare Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-clock-history fs-1 text-warning mb-3"></i>
+                    <h5 class="card-title">Search History</h5>
+                    <p class="card-text text-muted">Your recent searches are saved so you can quickly go back to previous results.</p>
+                    <a href="{{ url_for('history') }}" class="btn btn-outline-warning btn-sm">View History</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-info-circle fs-1 text-info mb-3"></i>
+                    <h5 class="card-title">Severity Guide</h5>
+                    <p class="card-text text-muted">Not sure what a CVSS score means? Check out the guide to understand severity ratings.</p>
+                    <a href="{{ url_for('severity_guide') }}" class="btn btn-outline-info btn-sm">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- notable CVEs to try -->
+    <div class="mt-5">
+        <h5 class="text-muted mb-3">Try these notable CVEs:</h5>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a href="{{ url_for('search') }}" onclick="submitCVE('CVE-2021-44228')" class="badge bg-danger text-decoration-none p-2 fs-6">CVE-2021-44228 (Log4Shell)</a>
+            <a href="{{ url_for('search') }}" onclick="submitCVE('CVE-2017-0144')" class="badge bg-danger text-decoration-none p-2 fs-6">CVE-2017-0144 (EternalBlue)</a>
+            <a href="{{ url_for('search') }}" onclick="submitCVE('CVE-2014-0160')" class="badge bg-warning text-decoration-none p-2 fs-6">CVE-2014-0160 (Heartbleed)</a>
+            <a href="{{ url_for('search') }}" onclick="submitCVE('CVE-2021-34527')" class="badge bg-danger text-decoration-none p-2 fs-6">CVE-2021-34527 (PrintNightmare)</a>
+        </div>
+    </div>
+</div>
+ 
+<script>
+// little helper so the quick-links on the home page actually submit to search
+function submitCVE(cveId) {
+    event.preventDefault();
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/search';
+    const q = document.createElement('input');
+    q.name = 'query';
+    q.value = cveId;
+    const t = document.createElement('input');
+    t.name = 'search_type';
+    t.value = 'cve_id';
+    form.appendChild(q);
+    form.appendChild(t);
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+{% endblock %}
