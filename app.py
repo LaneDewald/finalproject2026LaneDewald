@@ -138,4 +138,57 @@ def query_nvd(keyword=None, cve_id=None, results_per_page=10):
     except Exception as e:
         return None, f"An unexpected error occurred: {str(e)}"
 
+#Route for searches
+@app.route("/")
+def index():
+    return render_template("index.html")
 
+
+@app.route("/search", methods=["GET", "POST"])
+def search():
+    results = None
+    error = None
+    query = ""
+    search_type = "keyword"
+    total = 0
+
+    if request.method == "POST":
+        query = request.form.get("query", "").strip()
+        search_type = request.form.get("search_type", "keyword")
+
+        if not query:
+            error = "Please enter a search term."
+        else:
+            if search_type == "cve_id":
+                data, error = query_nvd(cve_id=query)
+            else:
+                data, error = query_nvd(keyword=query)
+
+            if data:
+                results = data["results"]
+                total = data["total"]
+
+                #Save search history to session
+                if "history" not in session:
+                    session["history"] = []
+
+                history_entry = {
+                    "query": query,
+                    "type": search_type,
+                    "count": len(results),
+                    "timestamp": datetime.now().strftime("%m/%d/%Y %H:%M"),
+                }
+                # avoid duplicate consecutive searches
+                if not session["history"] or session["history"][-1]["query"] != query:
+                    session["history"].insert(0, history_entry)
+                    session["history"] = session["history"][:10]  # keep last 10
+                    session.modified = True
+
+    return render_template(
+        "search.html",
+        results=results,
+        error=error,
+        query=query,
+        search_type=search_type,
+        total=total,
+    )

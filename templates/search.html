@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Search - CVE Lookup{% endblock %}
+ 
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-search me-2"></i>Search Vulnerabilities</h2>
+ 
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('search') }}">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Search Term</label>
+                    <input type="text" name="query" class="form-control form-control-lg"
+                           placeholder="e.g. Apache, OpenSSL, CVE-2021-44228"
+                           value="{{ query }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Search By</label>
+                    <select name="search_type" class="form-select form-select-lg">
+                        <option value="keyword" {% if search_type == 'keyword' %}selected{% endif %}>Keyword</option>
+                        <option value="cve_id" {% if search_type == 'cve_id' %}selected{% endif %}>CVE ID</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-danger btn-lg w-100">
+                        <i class="bi bi-search me-1"></i>Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+ 
+{% if error %}
+<div class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+</div>
+{% endif %}
+ 
+{% if results is not none %}
+    {% if results %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">
+            Results for "<strong>{{ query }}</strong>"
+            <span class="badge bg-secondary ms-2">{{ total }} total found, showing {{ results|length }}</span>
+        </h5>
+    </div>
+ 
+    <div class="row g-3">
+        {% for cve in results %}
+        <div class="col-12">
+            <div class="card shadow-sm cve-card border-start border-{{ cve.severity_color }} border-4">
+                <div class="card-body">
+                    <div class="row align-items-start">
+                        <div class="col-md-9">
+                            <div class="d-flex align-items-center mb-2">
+                                <h5 class="card-title mb-0 me-3">
+                                    <a href="https://nvd.nist.gov/vuln/detail/{{ cve.id }}" target="_blank" class="text-decoration-none">
+                                        {{ cve.id }}
+                                    </a>
+                                </h5>
+                                <span class="badge bg-{{ cve.severity_color }}">{{ cve.severity_label }}</span>
+                            </div>
+                            <p class="card-text text-muted mb-2">{{ cve.description[:300] }}{% if cve.description|length > 300 %}...{% endif %}</p>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar3 me-1"></i>Published: {{ cve.published }}
+                            </small>
+                        </div>
+                        <div class="col-md-3 text-md-end mt-2 mt-md-0">
+                            {% if cve.cvss_score %}
+                            <div class="cvss-score-badge bg-{{ cve.severity_color }}">
+                                <div class="score-number">{{ cve.cvss_score }}</div>
+                                <div class="score-label">CVSS v{{ cve.cvss_version }}</div>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">No score available</span>
+                            {% endif %}
+ 
+                            <div class="mt-2">
+                                <a href="https://nvd.nist.gov/vuln/detail/{{ cve.id }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>Full Details
+                                </a>
+                                <!-- Compare shortcut button -->
+                                <a href="{{ url_for('compare') }}?cve1={{ cve.id }}" class="btn btn-sm btn-outline-primary ms-1">
+                                    <i class="bi bi-bar-chart-steps me-1"></i>Compare
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    {% if cve.references %}
+                    <div class="mt-2">
+                        <small class="text-muted fw-semibold">References: </small>
+                        {% for ref in cve.references[:3] %}
+                        <a href="{{ ref }}" target="_blank" class="badge bg-light text-dark text-decoration-none me-1 border">
+                            <i class="bi bi-link-45deg"></i> {{ ref[:50] }}{% if ref|length > 50 %}...{% endif %}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+ 
+    {% else %}
+    <div class="alert alert-warning">
+        <i class="bi bi-search me-2"></i>No results found for "<strong>{{ query }}</strong>". Try a different keyword or check your CVE ID format (e.g. CVE-2021-44228).
+    </div>
+    {% endif %}
+{% endif %}
+ 
+{% endblock %}
