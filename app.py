@@ -254,7 +254,13 @@ def clear_history():
 
 @app.route("/severity-guide")
 def severity_guide():
+    """
+    CVSS Severity Reference Guide page.
+    Explains what the scores mean, how CVSS works, and gives users
+    context for interpreting results. Useful for students/beginners.
+    """
     return render_template("severity_guide.html")
+
 
 @app.route("/about")
 def about():

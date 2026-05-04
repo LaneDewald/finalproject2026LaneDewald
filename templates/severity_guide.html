@@ -1,10 +1,142 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Severity Guide - CVE Lookup{% endblock %}
+ 
+{% block content %}
+<h2 class="mb-2"><i class="bi bi-info-circle me-2"></i>CVSS Severity Guide</h2>
+<p class="text-muted mb-4">
+    This page explains what CVSS scores mean and how to interpret the severity ratings shown in search results.
+    Understanding these scores is important for prioritizing which vulnerabilities to address first.
+</p>
+ 
+<!-- score range table -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white fw-semibold">
+        CVSS v3.x Score Ranges
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-bordered mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Severity</th>
+                    <th>Score Range</th>
+                    <th>What It Means</th>
+                    <th>Example Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="table-danger">
+                    <td><span class="badge bg-danger fs-6">CRITICAL</span></td>
+                    <td>9.0 – 10.0</td>
+                    <td>Extremely dangerous. Usually remotely exploitable with no authentication required, often with wormable potential.</td>
+                    <td>Patch immediately, consider taking affected systems offline if possible.</td>
+                </tr>
+                <tr class="table-warning">
+                    <td><span class="badge bg-warning fs-6">HIGH</span></td>
+                    <td>7.0 – 8.9</td>
+                    <td>Serious vulnerability. May require some conditions to exploit but still poses significant risk.</td>
+                    <td>Patch within days. Investigate if any systems may already be compromised.</td>
+                </tr>
+                <tr class="table-info">
+                    <td><span class="badge bg-info fs-6">MEDIUM</span></td>
+                    <td>4.0 – 6.9</td>
+                    <td>Moderate risk. Often requires local access, user interaction, or specific conditions.</td>
+                    <td>Patch within your normal patch cycle (usually 30 days).</td>
+                </tr>
+                <tr class="table-success">
+                    <td><span class="badge bg-success fs-6">LOW</span></td>
+                    <td>0.1 – 3.9</td>
+                    <td>Minimal risk in most environments. Exploitation is difficult or impact is very limited.</td>
+                    <td>Patch when convenient, monitor for changes in exploitability.</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bg-secondary fs-6">NONE / N/A</span></td>
+                    <td>0.0 or missing</td>
+                    <td>No security impact, or the CVE has not been scored yet by NIST.</td>
+                    <td>Monitor for score updates. Some CVEs are still being analyzed.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+ 
+<!-- what is CVSS -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-secondary text-white fw-semibold">What is CVSS?</div>
+            <div class="card-body">
+                <p>
+                    CVSS stands for <strong>Common Vulnerability Scoring System</strong>. It's an open industry standard
+                    for assessing the severity of computer system security vulnerabilities. It was created by the
+                    National Infrastructure Advisory Council (NIAC) and is maintained by FIRST.org.
+                </p>
+                <p>
+                    The current version is <strong>CVSS v3.1</strong>, though you'll still see v3.0 and v2.0 scores
+                    on older CVEs. The scoring system is designed to be vendor-neutral and consistent.
+                </p>
+                <p class="mb-0">
+                    CVSS does NOT tell you how likely a vulnerability is to be exploited in the real world —
+                    just how bad it could be if it were. Tools like EPSS (Exploit Prediction Scoring System) are
+                    used alongside CVSS for a fuller picture.
+                </p>
+            </div>
+        </div>
+    </div>
+ 
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-secondary text-white fw-semibold">Understanding the CVSS Vector String</div>
+            <div class="card-body">
+                <p>The vector string encodes all the metrics used to calculate the score. Example:</p>
+                <code class="d-block bg-light p-2 rounded mb-3">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H</code>
+                <p class="small">Key components:</p>
+                <ul class="small">
+                    <li><strong>AV (Attack Vector):</strong> N=Network, A=Adjacent, L=Local, P=Physical</li>
+                    <li><strong>AC (Attack Complexity):</strong> L=Low, H=High</li>
+                    <li><strong>PR (Privileges Required):</strong> N=None, L=Low, H=High</li>
+                    <li><strong>UI (User Interaction):</strong> N=None, R=Required</li>
+                    <li><strong>S (Scope):</strong> U=Unchanged, C=Changed</li>
+                    <li><strong>C/I/A (CIA Impact):</strong> H=High, L=Low, N=None</li>
+                </ul>
+                <p class="mb-0 small text-muted">AV:N + AC:L + PR:N + UI:N is the worst case — remotely exploitable with no conditions.</p>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+<!-- notable CVE examples -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white fw-semibold">Famous CVE Examples by Severity</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="border rounded p-3 border-danger">
+                    <h6 class="text-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>Critical Examples</h6>
+                    <ul class="mb-0 small">
+                        <li><strong>CVE-2021-44228</strong> – Log4Shell (CVSS 10.0) – Remote code execution in Apache Log4j</li>
+                        <li><strong>CVE-2017-0144</strong> – EternalBlue (CVSS 8.1 / used in WannaCry) – SMB exploit</li>
+                        <li><strong>CVE-2021-34527</strong> – PrintNightmare (CVSS 8.8) – Windows Print Spooler RCE</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="border rounded p-3 border-warning">
+                    <h6 class="text-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>High/Medium Examples</h6>
+                    <ul class="mb-0 small">
+                        <li><strong>CVE-2014-0160</strong> – Heartbleed (CVSS 7.5) – OpenSSL memory disclosure</li>
+                        <li><strong>CVE-2017-5638</strong> – Apache Struts RCE (CVSS 10.0) – Used in Equifax breach</li>
+                        <li><strong>CVE-2019-0708</strong> – BlueKeep (CVSS 9.8) – Windows RDP vulnerability</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+<div class="alert alert-info">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Pro tip:</strong> When prioritizing patches, combine CVSS scores with context — is the vulnerable service exposed to the internet? 
+    Is it a critical business system? A CVSS 7.0 on an internet-facing server might be more urgent than a CVSS 9.0 on an air-gapped system.
+</div>
+ 
+{% endblock %}
