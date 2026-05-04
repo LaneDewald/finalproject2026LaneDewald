@@ -192,3 +192,64 @@ def search():
         search_type=search_type,
         total=total,
     )
+
+#Route and functionality for compare
+@app.route("/compare", methods=["GET", "POST"])
+def compare():
+    """
+    Compare two CVEs side by side.
+    This lets users quickly see the difference in severity, score, etc.
+    between two vulnerabilities which is useful when triaging.
+    """
+    cve1_data = None
+    cve2_data = None
+    error = None
+    cve1_id = ""
+    cve2_id = ""
+
+    if request.method == "POST":
+        cve1_id = request.form.get("cve1", "").strip()
+        cve2_id = request.form.get("cve2", "").strip()
+
+        if not cve1_id or not cve2_id:
+            error = "Please enter two CVE IDs to compare."
+        else:
+            data1, err1 = query_nvd(cve_id=cve1_id)
+            data2, err2 = query_nvd(cve_id=cve2_id)
+
+            if err1:
+                error = f"Error fetching {cve1_id}: {err1}"
+            elif err2:
+                error = f"Error fetching {cve2_id}: {err2}"
+            elif not data1["results"]:
+                error = f"No results found for {cve1_id}. Check the ID and try again."
+            elif not data2["results"]:
+                error = f"No results found for {cve2_id}. Check the ID and try again."
+            else:
+                cve1_data = data1["results"][0]
+                cve2_data = data2["results"][0]
+
+    return render_template(
+        "compare.html",
+        cve1=cve1_data,
+        cve2=cve2_data,
+        error=error,
+        cve1_id=cve1_id,
+        cve2_id=cve2_id,
+    )
+
+@app.route("/history")
+def history():
+    return render_template("history.html")
+
+@app.route("/severity-guide")
+def severity_guide():
+    return render_template("severity_guide.html")
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+if __name__ == "__main__":
+    app.run(debug=True)
+

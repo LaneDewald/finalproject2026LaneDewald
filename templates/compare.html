@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Compare CVEs - CVE Lookup{% endblock %}
+ 
+{% block content %}
+<h2 class="mb-2"><i class="bi bi-bar-chart-steps me-2"></i>Compare CVEs</h2>
+<p class="text-muted mb-4">Enter two CVE IDs to see them side by side. Useful for triage and prioritization.</p>
+ 
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('compare') }}">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">First CVE ID</label>
+                    <input type="text" name="cve1" class="form-control" placeholder="e.g. CVE-2021-44228" value="{{ cve1_id }}">
+                </div>
+                <div class="col-md-1 text-center pb-1">
+                    <span class="fs-4 text-muted fw-bold">vs</span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Second CVE ID</label>
+                    <input type="text" name="cve2" class="form-control" placeholder="e.g. CVE-2014-0160" value="{{ cve2_id }}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-success btn-lg w-100">
+                        <i class="bi bi-bar-chart-steps me-1"></i>Compare
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+ 
+{% if error %}
+<div class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+</div>
+{% endif %}
+ 
+{% if cve1 and cve2 %}
+<!-- winner banner -->
+<div class="alert {% if cve1.cvss_score and cve2.cvss_score %}
+    {% if cve1.cvss_score > cve2.cvss_score %}alert-danger{% elif cve2.cvss_score > cve1.cvss_score %}alert-danger{% else %}alert-warning{% endif %}
+{% else %}alert-secondary{% endif %} mb-4">
+    <i class="bi bi-trophy-fill me-2"></i>
+    {% if cve1.cvss_score and cve2.cvss_score %}
+        {% if cve1.cvss_score > cve2.cvss_score %}
+            <strong>{{ cve1.id }}</strong> is more severe with a CVSS score of <strong>{{ cve1.cvss_score }}</strong> vs {{ cve2.cvss_score }}
+        {% elif cve2.cvss_score > cve1.cvss_score %}
+            <strong>{{ cve2.id }}</strong> is more severe with a CVSS score of <strong>{{ cve2.cvss_score }}</strong> vs {{ cve1.cvss_score }}
+        {% else %}
+            Both CVEs have the same CVSS score of <strong>{{ cve1.cvss_score }}</strong>
+        {% endif %}
+    {% else %}
+        One or both CVEs are missing a CVSS score — comparison is limited.
+    {% endif %}
+</div>
+ 
+<div class="row g-4">
+    <!-- CVE 1 -->
+    <div class="col-md-6">
+        <div class="card shadow border-top border-{{ cve1.severity_color }} border-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ cve1.id }}</h5>
+                <span class="badge bg-{{ cve1.severity_color }} fs-6">{{ cve1.severity_label }}</span>
+            </div>
+            <div class="card-body">
+                {% if cve1.cvss_score %}
+                <div class="text-center mb-3">
+                    <div class="cvss-score-badge bg-{{ cve1.severity_color }} d-inline-block">
+                        <div class="score-number">{{ cve1.cvss_score }}</div>
+                        <div class="score-label">CVSS v{{ cve1.cvss_version }}</div>
+                    </div>
+                </div>
+                {% endif %}
+ 
+                <table class="table table-sm">
+                    <tr>
+                        <td class="text-muted fw-semibold">Published</td>
+                        <td>{{ cve1.published }}</td>
+                    </tr>
+                    {% if cve1.cvss_vector %}
+                    <tr>
+                        <td class="text-muted fw-semibold">Vector</td>
+                        <td><small class="font-monospace">{{ cve1.cvss_vector }}</small></td>
+                    </tr>
+                    {% endif %}
+                </table>
+ 
+                <p class="small text-muted">{{ cve1.description[:400] }}{% if cve1.description|length > 400 %}...{% endif %}</p>
+ 
+                {% if cve1.references %}
+                <div class="mt-2">
+                    <p class="mb-1 fw-semibold small">References:</p>
+                    {% for ref in cve1.references[:3] %}
+                    <div><a href="{{ ref }}" target="_blank" class="small text-truncate d-block">{{ ref[:60] }}{% if ref|length > 60 %}...{% endif %}</a></div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+ 
+                <div class="mt-3">
+                    <a href="https://nvd.nist.gov/vuln/detail/{{ cve1.id }}" target="_blank" class="btn btn-sm btn-outline-secondary w-100">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>View on NVD
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- CVE 2 -->
+    <div class="col-md-6">
+        <div class="card shadow border-top border-{{ cve2.severity_color }} border-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ cve2.id }}</h5>
+                <span class="badge bg-{{ cve2.severity_color }} fs-6">{{ cve2.severity_label }}</span>
+            </div>
+            <div class="card-body">
+                {% if cve2.cvss_score %}
+                <div class="text-center mb-3">
+                    <div class="cvss-score-badge bg-{{ cve2.severity_color }} d-inline-block">
+                        <div class="score-number">{{ cve2.cvss_score }}</div>
+                        <div class="score-label">CVSS v{{ cve2.cvss_version }}</div>
+                    </div>
+                </div>
+                {% endif %}
+ 
+                <table class="table table-sm">
+                    <tr>
+                        <td class="text-muted fw-semibold">Published</td>
+                        <td>{{ cve2.published }}</td>
+                    </tr>
+                    {% if cve2.cvss_vector %}
+                    <tr>
+                        <td class="text-muted fw-semibold">Vector</td>
+                        <td><small class="font-monospace">{{ cve2.cvss_vector }}</small></td>
+                    </tr>
+                    {% endif %}
+                </table>
+ 
+                <p class="small text-muted">{{ cve2.description[:400] }}{% if cve2.description|length > 400 %}...{% endif %}</p>
+ 
+                {% if cve2.references %}
+                <div class="mt-2">
+                    <p class="mb-1 fw-semibold small">References:</p>
+                    {% for ref in cve2.references[:3] %}
+                    <div><a href="{{ ref }}" target="_blank" class="small text-truncate d-block">{{ ref[:60] }}{% if ref|length > 60 %}...{% endif %}</a></div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+ 
+                <div class="mt-3">
+                    <a href="https://nvd.nist.gov/vuln/detail/{{ cve2.id }}" target="_blank" class="btn btn-sm btn-outline-secondary w-100">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>View on NVD
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+ 
+{% endblock %}
