@@ -1,10 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}About - CVE Lookup{% endblock %}
+ 
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="mb-4"><i class="bi bi-person-circle me-2"></i>About This Project</h2>
+ 
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5>Project Overview</h5>
+                <p>
+                    This is my final project for <strong>INF601 – Advanced Programming with Python</strong>.
+                    The goal was to build a practical, multi-page web application using Flask and a real-world API.
+                    I chose to build a CVE Lookup Tool because cybersecurity is my major and being able to quickly
+                    look up vulnerability data is a genuinely useful skill.
+                </p>
+                <p>
+                    The app uses the <strong>NIST National Vulnerability Database (NVD) REST API v2.0</strong>
+                    to fetch real CVE data. Everything is free and no API key is required for basic queries,
+                    though NVD does have rate limits so the app includes basic error handling for that.
+                </p>
+            </div>
+        </div>
+ 
+        <div class="card shadow-sm mb-4">
+            <div class="card-header fw-semibold">Features</div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Keyword & CVE ID Search</strong> – Query NVD by product name, technology, or exact CVE identifier</li>
+                    <li><strong>CVE Comparison Tool</strong> – Compare two CVEs side by side with a severity winner summary</li>
+                    <li><strong>Search History</strong> – Session-based history so you can re-run recent searches with one click</li>
+                    <li><strong>CVSS Severity Guide</strong> – An educational reference page explaining what scores mean</li>
+                    <li><strong>CVSS v3/v2 Support</strong> – Automatically uses the best available CVSS version for each CVE</li>
+                    <li><strong>Error Handling</strong> – Gracefully handles timeouts, bad IDs, and empty results</li>
+                </ul>
+            </div>
+        </div>
+ 
+        <div class="card shadow-sm mb-4">
+            <div class="card-header fw-semibold">Tech Stack</div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Python 3.x</strong></li>
+                    <li><strong>Flask</strong> – Web framework, routing, session management</li>
+                    <li><strong>Requests</strong> – HTTP library for API calls</li>
+                    <li><strong>Jinja2</strong> – Templating (comes with Flask)</li>
+                    <li><strong>Bootstrap 5</strong> – CSS framework for styling</li>
+                    <li><strong>NVD API v2.0</strong> – Data source</li>
+                </ul>
+            </div>
+        </div>
+ 
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Author</h5>
+                <p class="mb-0">
+                    <strong>Lane DeWald</strong><br>
+                    Cybersecurity Major<br>
+                    INF601 – Advanced Programming with Python
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
