@@ -238,9 +238,19 @@ def compare():
         cve2_id=cve2_id,
     )
 
+
 @app.route("/history")
 def history():
-    return render_template("history.html")
+    """Show the user's recent search history stored in the session."""
+    search_history = session.get("history", [])
+    return render_template("history.html", history=search_history)
+
+
+@app.route("/clear_history")
+def clear_history():
+    session.pop("history", None)
+    return redirect(url_for("history"))
+
 
 @app.route("/severity-guide")
 def severity_guide():
